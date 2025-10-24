@@ -5,6 +5,8 @@
 
 FROM eclipse-temurin:21-jdk-jammy
 
+ARG VERSION=1.0.0
+LABEL version=$VERSION
 LABEL maintainer="kassadin@foxmail.com"
 LABEL description="JDK 21 + Android SDK 35 + Node 22 + Gradle 8.11.1 CI 环境"
 
@@ -42,10 +44,11 @@ RUN yes | sdkmanager --sdk_root=$ANDROID_HOME --licenses \
 
 # ---- 安装 Gradle 8.11.1 ----
 ENV GRADLE_VERSION=8.11.1
-RUN wget -q https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-all.zip -O /tmp/gradle.zip \
- && unzip /tmp/gradle.zip -d /opt \
- && mv /opt/gradle-${GRADLE_VERSION} /opt/gradle \
- && rm /tmp/gradle.zip
+RUN wget --quiet --output-document=gradle.zip "https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-all.zip" \
+ && unzip gradle.zip \
+ && rm gradle.zip \
+ && mv "gradle-${GRADLE_VERSION}" "${GRADLE_HOME}" \
+ && ln -s "${GRADLE_HOME}/bin/gradle" /usr/bin/gradle
 
 # ---- 验证环境 ----
 RUN java -version \

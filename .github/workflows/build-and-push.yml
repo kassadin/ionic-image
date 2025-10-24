@@ -25,11 +25,19 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Read version from Dockerfile
+        id: version
+        run: |
+          VERSION=$(grep -E '^ARG VERSION=' Dockerfile | cut -d'=' -f2)
+          echo "VERSION=${VERSION}" >> $GITHUB_ENV
+          echo "Detected VERSION=$VERSION"
+
       - name: Build and push image
         uses: docker/build-push-action@v6
         with:
           push: true
+          build-args: |
+            VERSION=${{ env.VERSION }}-build${{ github.run_number }}
           tags: |
             ghcr.io/${{ github.repository_owner }}/ionic:latest
-            ghcr.io/${{ github.repository_owner }}/ionic:21-35-22-8.11.1
-
+            ghcr.io/${{ github.repository_owner }}/ionic:${{ env.VERSION }}-build${{ github.run_number }}
