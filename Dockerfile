@@ -1,5 +1,5 @@
 # ===========================================================
-# 基础镜像：JDK 21 + Android SDK 35 + Node 22 + Gradle 8.11.1
+# 基础镜像：JDK 21 + Android SDK 35 + Node 22
 # 基于 Ubuntu 22.04 Jamm
 # ===========================================================
 
@@ -8,12 +8,11 @@ FROM eclipse-temurin:21-jdk-jammy
 ARG VERSION=1.0.0
 LABEL version=$VERSION
 LABEL maintainer="kassadin@foxmail.com"
-LABEL description="JDK 21 + Android SDK 35 + Node 22 + Gradle 8.11.1 CI 环境"
+LABEL description="JDK 21 + Android SDK 35 + Node 22 CI 环境"
 
 # ---- 环境变量 ----
 ENV ANDROID_HOME=/opt/android-sdk
-ENV GRADLE_HOME=/opt/gradle
-ENV PATH=$PATH:$GRADLE_HOME/bin:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools
+ENV PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools
 
 # ---- 系统依赖 ----
 RUN apt-get update -y && apt-get install -y --no-install-recommends \
@@ -42,19 +41,5 @@ RUN yes | sdkmanager --sdk_root=$ANDROID_HOME --licenses \
       "build-tools;34.0.0" \
       "build-tools;35.0.0" \
       "cmdline-tools;latest"
-
-# ---- 安装 Gradle 8.11.1 ----
-ENV GRADLE_VERSION=8.11.1
-RUN wget --quiet --output-document=gradle.zip "https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-all.zip" \
- && unzip gradle.zip \
- && rm gradle.zip \
- && mv "gradle-${GRADLE_VERSION}" "${GRADLE_HOME}" \
- && ln -s "${GRADLE_HOME}/bin/gradle" /usr/bin/gradle
-
-# ---- 验证环境 ----
-RUN java -version \
- && node -v \
- && gradle -v | head -n 5 \
- && sdkmanager --list | head -n 10
 
 WORKDIR /workspace
