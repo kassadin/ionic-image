@@ -30,15 +30,16 @@ RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
 RUN mkdir -p $ANDROID_HOME/cmdline-tools \
  && cd $ANDROID_HOME/cmdline-tools \
  && wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O cmdline-tools.zip \
- && unzip cmdline-tools.zip -d . \
- && mv cmdline-tools latest \
- && rm cmdline-tools.zip
+ && unzip -q cmdline-tools.zip \
+ && rm cmdline-tools.zip \
+ && mv cmdline-tools latest 
 
 # ---- 安装 SDK 组件（API 35）----
 RUN yes | sdkmanager --sdk_root=$ANDROID_HOME --licenses \
  && sdkmanager --sdk_root=$ANDROID_HOME \
       "platform-tools" \
       "platforms;android-35" \
+      "build-tools;34.0.0" \
       "build-tools;35.0.0" \
       "cmdline-tools;latest"
 
